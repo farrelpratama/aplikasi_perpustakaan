@@ -1,5 +1,5 @@
 class User:
-    def __init__(self, id: str, email: str, full_name: str = None, is_admin: bool = False):
+    def __init__(self, id: str, email: str, full_name: str = None, is_admin: bool = False, created_at: str = None):
         """
         Representasi objek pengguna (user atau admin).
         """
@@ -7,6 +7,7 @@ class User:
         self.email = email
         self.full_name = full_name
         self.is_admin = is_admin
+        self.created_at = created_at
 
     def __repr__(self):
         role = "Admin" if self.is_admin else "User"
@@ -20,5 +21,6 @@ class User:
             "id": self.id,
             "email": self.email,
             "full_name": self.full_name,
-            "is_admin": self.is_admin
+            "is_admin": self.is_admin,
+            "created_at": self.created_at
         }

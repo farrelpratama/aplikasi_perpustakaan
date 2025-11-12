@@ -1,6 +1,5 @@
 # services/book_service.py
-
-from services.db_client import db
+from services.db_client import ClientDB as db
 from models.book import Book
 from typing import Optional, List
 from datetime import datetime
@@ -9,16 +8,16 @@ class BookService:
     """Service untuk handle semua operasi terkait Book"""
     
     @staticmethod
-    def create_book(title: str, author: str, isbn: str, category: str, 
-                   stock: int, description: str = None) -> Optional[Book]:
+    def create_book(title: str, author: str, isbn: str, 
+                   total_count: int,) -> Optional[Book]:
         """Tambah buku baru (untuk admin)"""
         try:
             # Validasi input
-            if not title or not author or not isbn or not category:
+            if not title or not author or not isbn:
                 print("Error: Title, author, ISBN, dan category harus diisi")
                 return None
             
-            if stock < 0:
+            if total_count < 0:
                 print("Error: Stock tidak boleh negatif")
                 return None
             
@@ -33,9 +32,9 @@ class BookService:
                 'title': title,
                 'author': author,
                 'isbn': isbn,
-                'category': category,
-                'stock': stock,
-                'description': description
+                'total_count': total_count,
+                'available_count': total_count,
+                "created_at": datetime.utcnow().isoformat()
             }).execute()
             
             if response.data:
@@ -46,9 +45,8 @@ class BookService:
                     title=data['title'],
                     author=data['author'],
                     isbn=data['isbn'],
-                    category=data['category'],
-                    stock=data['stock'],
-                    description=data.get('description'),
+                    total_count=data['total_count'],
+                    available_count=data['available_count'],
                     created_at=datetime.fromisoformat(data['created_at'].replace('Z', '+00:00'))
                 )
             return None
@@ -61,7 +59,7 @@ class BookService:
     def get_all_books() -> List[Book]:
         """Get semua buku"""
         try:
-            response = db.table('books').select('*').order('title', desc=False).execute()
+            response = db.table('books').select('*').order('title').execute()
             
             books = []
             for data in response.data:
@@ -70,9 +68,8 @@ class BookService:
                     title=data['title'],
                     author=data['author'],
                     isbn=data['isbn'],
-                    category=data['category'],
-                    stock=data['stock'],
-                    description=data.get('description'),
+                    total_count=data['total_count'],
+                    available_count=data['available_count'],
                     created_at=datetime.fromisoformat(data['created_at'].replace('Z', '+00:00'))
                 ))
             
@@ -87,7 +84,7 @@ class BookService:
     def get_available_books() -> List[Book]:
         """Get buku yang tersedia (stock > 0)"""
         try:
-            response = db.table('books').select('*').gt('stock', 0).order('title', desc=False).execute()
+            response = db.table('books').select('*').gt('available_count', 0).order('title').execute()
             
             books = []
             for data in response.data:
@@ -95,10 +92,8 @@ class BookService:
                     id=data['id'],
                     title=data['title'],
                     author=data['author'],
-                    isbn=data['isbn'],
-                    category=data['category'],
-                    stock=data['stock'],
-                    description=data.get('description'),
+                    total_count=data['total_count'],
+                    available_count=data['available_count'],
                     created_at=datetime.fromisoformat(data['created_at'].replace('Z', '+00:00'))
                 ))
             
@@ -122,9 +117,8 @@ class BookService:
                     title=data['title'],
                     author=data['author'],
                     isbn=data['isbn'],
-                    category=data['category'],
-                    stock=data['stock'],
-                    description=data.get('description'),
+                    total_count=data['total_count'],
+                    available_count=data['available_count'],
                     created_at=datetime.fromisoformat(data['created_at'].replace('Z', '+00:00'))
                 )
             return None
@@ -155,9 +149,8 @@ class BookService:
                         title=data['title'],
                         author=data['author'],
                         isbn=data['isbn'],
-                        category=data['category'],
-                        stock=data['stock'],
-                        description=data.get('description'),
+                        total_count=data['total_count'],
+                        available_count=data['available_count'],
                         created_at=datetime.fromisoformat(data['created_at'].replace('Z', '+00:00'))
                     ))
             
@@ -170,8 +163,7 @@ class BookService:
     
     @staticmethod
     def update_book(book_id: str, title: str = None, author: str = None, 
-                   isbn: str = None, category: str = None, stock: int = None,
-                   description: str = None) -> bool:
+                   isbn: str = None, total_count: int = None, available_count: int = None) -> bool:
         """Update data buku (untuk admin)"""
         try:
             update_data = {}
@@ -182,12 +174,10 @@ class BookService:
                 update_data['author'] = author
             if isbn:
                 update_data['isbn'] = isbn
-            if category:
-                update_data['category'] = category
-            if stock is not None:
-                update_data['stock'] = stock
-            if description is not None:
-                update_data['description'] = description
+            if total_count is not None:
+                update_data['total_count'] = total_count
+            if available_count is not None:
+                update_data['available_count'] = available_count
             
             if not update_data:
                 print("Error: Tidak ada data yang diupdate")
@@ -239,11 +229,11 @@ class BookService:
                 return False
             
             response = db.table('books').update({
-                'stock': new_stock
+                'total_count': new_stock
             }).eq('id', book_id).execute()
             
             if response.data:
-                print(f"✅ Stock diupdate: {book.stock} → {new_stock}")
+                print(f"✅ Stock diupdate: {book.total_count} → {new_stock}")
                 return True
             return False
             
@@ -265,7 +255,8 @@ class BookService:
                     author=data['author'],
                     isbn=data['isbn'],
                     category=data['category'],
-                    stock=data['stock'],
+                    total_count=data['total_count'],
+                    available_count=data['available_count'],
                     description=data.get('description'),
                     created_at=datetime.fromisoformat(data['created_at'].replace('Z', '+00:00'))
                 ))

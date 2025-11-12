@@ -1,28 +1,27 @@
 # services/user_service.py
-
-from services.db_client import db
-from models.user     import User
+from services.db_client import ClientDB as db
+from models.user import User
 from typing import Optional, List
 import bcrypt
 from datetime import datetime
 
 class UserService:
     """Service untuk handle semua operasi terkait User"""
-    
+
     @staticmethod
-    def register(username: str, email: str, password: str, role: str = 'user') -> Optional[User]:
+    def register(full_name: str, email: str, password: str, role: str = 'user') -> Optional[User]:
         """Register user baru"""
     
         try:
             # Validasi input
-            if not username or not email or not password:
+            if not full_name or not email or not password:
                 print("Error: Semua field harus diisi")
                 return None
-            
+    
             # Cek username sudah ada atau belum
-            existing = db.table('users').select('*').eq('username', username).execute()
+            existing = db.table('users').select('*').eq('full_name', full_name).execute()
             if existing.data:
-                print(f"Error: Username '{username}' sudah digunakan")
+                print(f"Error: Username '{full_name}' sudah digunakan")
                 return None
             
             # Cek email sudah ada atau belum
@@ -39,7 +38,7 @@ class UserService:
             
             # Insert ke database
             response = db.table('users').insert({
-                'username': username,
+                'full_name': full_name,
                 'email': email,
                 'password_hash': password_hash,
                 'role': role
@@ -47,10 +46,10 @@ class UserService:
             
             if response.data:
                 data = response.data[0]
-                print(f"✅ User '{username}' berhasil didaftarkan")
+                print(f"✅ User '{full_name}' berhasil didaftarkan")
                 return User(
                     id=data['id'],
-                    username=data['username'],
+                    full_name=data['full_name'],
                     email=data['email'],
                     role=data['role'],
                     created_at=datetime.fromisoformat(data['created_at'].replace('Z', '+00:00'))
@@ -62,29 +61,29 @@ class UserService:
             return None
     
     @staticmethod
-    def login(username: str, password: str) -> Optional[User]:
+    def login(email: str, password: str) -> Optional[User]:
         """Login user"""
         try:
             # Validasi input
-            if not username or not password:
-                print("Error: Username dan password harus diisi")
+            if not email or not password:
+                print("Error: Email dan password harus diisi")
                 return None
             
             # Get user dari database
-            response = db.table('users').select('*').eq('username', username).execute()
+            response = db.table('users').select('*').eq('email', email).execute()
             
             if not response.data:
-                print(f"Error: Username '{username}' tidak ditemukan")
+                print(f"Error: Email '{email}' tidak ditemukan")
                 return None
             
             user_data = response.data[0]
             
             # Verify password
             if bcrypt.checkpw(password.encode('utf-8'), user_data['password_hash'].encode('utf-8')):
-                print(f"✅ Login berhasil: {username}")
+                print(f"✅ Login berhasil: {user_data['full_name']}")
                 return User(
                     id=user_data['id'],
-                    username=user_data['username'],
+                    full_name=user_data['full_name'],
                     email=user_data['email'],
                     role=user_data['role'],
                     created_at=datetime.fromisoformat(user_data['created_at'].replace('Z', '+00:00'))
@@ -107,7 +106,7 @@ class UserService:
             for data in response.data:
                 users.append(User(
                     id=data['id'],
-                    username=data['username'],
+                    full_name=data['full_name'],
                     email=data['email'],
                     role=data['role'],
                     created_at=datetime.fromisoformat(data['created_at'].replace('Z', '+00:00'))
@@ -130,7 +129,7 @@ class UserService:
                 data = response.data[0]
                 return User(
                     id=data['id'],
-                    username=data['username'],
+                    full_name=data['full_name'],
                     email=data['email'],
                     role=data['role'],
                     created_at=datetime.fromisoformat(data['created_at'].replace('Z', '+00:00'))
@@ -142,14 +141,14 @@ class UserService:
             return None
     
     @staticmethod
-    def update_user(user_id: str, username: str = None, email: str = None, 
+    def update_user(user_id: str, full_name: str = None, email: str = None, 
                    password: str = None, role: str = None) -> bool:
         """Update data user"""
         try:
             update_data = {}
             
-            if username:
-                update_data['username'] = username
+            if full_name :
+                update_data['full_name'] = full_name
             if email:
                 update_data['email'] = email
             if password:

@@ -5,8 +5,11 @@ from ui.register_window import RegisterWindow
 from models.user import User
 
 class LoginWindow(BaseWindow):
-    def __init__(self):
+    def __init__(self, user_svc, on_login, title, size):
         super().__init__()
+        self.user_svc = user_svc
+        self.on_login = on_login
+        
         self.root.title("Login - Sistem Perpustakaan")
         self.root.geometry("400x350")
         self.root.resizable(False, False)

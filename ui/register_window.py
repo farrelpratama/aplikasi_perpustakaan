@@ -1,6 +1,6 @@
 import tkinter as tk
 from tkinter import messagebox
-from models.user import User
+from services.user_service import UserService as User
 
 class RegisterWindow:
     def __init__(self, parent):
