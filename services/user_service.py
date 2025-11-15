@@ -1,5 +1,5 @@
 # services/user_service.py
-from services.db_client import ClientDB as db
+from services.db_client import db
 from models.user import User
 from typing import Optional, List
 import bcrypt
@@ -51,7 +51,7 @@ class UserService:
                     id=data['id'],
                     full_name=data['full_name'],
                     email=data['email'],
-                    role=data['role'],
+                    is_admin=(data.get('role') == 'admin'),
                     created_at=datetime.fromisoformat(data['created_at'].replace('Z', '+00:00'))
                 )
             return None
@@ -85,7 +85,7 @@ class UserService:
                     id=user_data['id'],
                     full_name=user_data['full_name'],
                     email=user_data['email'],
-                    role=user_data['role'],
+                    is_admin=(user_data.get('role') == 'admin'),
                     created_at=datetime.fromisoformat(user_data['created_at'].replace('Z', '+00:00'))
                 )
             else:
@@ -108,7 +108,7 @@ class UserService:
                     id=data['id'],
                     full_name=data['full_name'],
                     email=data['email'],
-                    role=data['role'],
+                    is_admin=(data.get('role') == 'admin'),
                     created_at=datetime.fromisoformat(data['created_at'].replace('Z', '+00:00'))
                 ))
             
@@ -131,7 +131,7 @@ class UserService:
                     id=data['id'],
                     full_name=data['full_name'],
                     email=data['email'],
-                    role=data['role'],
+                    is_admin=(data.get('role') == 'admin'),
                     created_at=datetime.fromisoformat(data['created_at'].replace('Z', '+00:00'))
                 )
             return None

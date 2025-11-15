@@ -1,5 +1,5 @@
 # services/book_service.py
-from services.db_client import ClientDB as db
+from services.db_client import db
 from models.book import Book
 from typing import Optional, List
 from datetime import datetime

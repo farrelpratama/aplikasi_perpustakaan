@@ -1,4 +1,4 @@
-from services.db_client import ClientDB as db
+from services.db_client import db
 from datetime import datetime, timedelta, date
 from models.loan import Loan
 

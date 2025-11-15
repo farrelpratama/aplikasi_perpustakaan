@@ -15,6 +15,10 @@ class RegisterWindow:
         tk.Label(self.top, text="Username").pack(pady=5)
         self.e_user = tk.Entry(self.top, width=30, font=("Times New Roman", 11))
         self.e_user.pack(pady=5)
+        
+        tk.Label(self.top, text="Email").pack(pady=5)
+        self.e_email = tk.Entry(self.top, width=30, font=("Times New Roman", 11))
+        self.e_email.pack(pady=5)
 
         tk.Label(self.top, text="Password").pack(pady=5)
         self.e_pass = tk.Entry(self.top, width=30, font=("Times New Roman", 11), show="*")
@@ -29,10 +33,11 @@ class RegisterWindow:
 
     def register(self):
         username = self.e_user.get().strip()
+        email = self.e_email.get()
         pass1 = self.e_pass.get()
         pass2 = self.e_pass2.get()
 
-        if not all([username, pass1, pass2]):
+        if not all([username, email, pass1, pass2]):
             messagebox.showerror("Error", "Semua field harus diisi!")
             return
         if pass1 != pass2:
@@ -42,7 +47,7 @@ class RegisterWindow:
             messagebox.showerror("Error", "Password minimal 6 karakter!")
             return
 
-        user = User.register(username, pass1)
+        user = User.register(username, email, pass1)
         if user:
             messagebox.showinfo("Sukses", f"Akun {username} berhasil dibuat!\nSilakan login.")
             self.top.destroy()
