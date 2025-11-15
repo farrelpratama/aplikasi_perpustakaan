@@ -8,10 +8,10 @@ class UserWindow(BaseWindow):
     def __init__(self, user):
         super().__init__()
         self.user = user
-        self.root.title(f"User - {user.username}")
+        self.root.title(f"User - {user.full_name}")
         self.root.geometry("900x600")
 
-        tk.Label(self.root, text=f"Selamat Datang, {user.username}!", 
+        tk.Label(self.root, text=f"Selamat Datang, {user.full_name}!", 
                  font=("Arial", 16)).pack(pady=10)
 
         # Tabel Buku

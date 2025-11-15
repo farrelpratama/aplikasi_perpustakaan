@@ -2,7 +2,7 @@ import tkinter as tk
 from tkinter import messagebox
 from ui.base_window import BaseWindow
 from ui.register_window import RegisterWindow
-from models.user import User
+from services.user_service import UserService
 
 class LoginWindow(BaseWindow):
     def __init__(self, user_svc, on_login, title, size):
@@ -17,12 +17,11 @@ class LoginWindow(BaseWindow):
         # Judul
         tk.Label(self.root, text="SISTEM PERPUSTAKAAN", font=("Times New Roman", 16, "bold")).pack(pady=20)
 
-        # Username
-        tk.Label(self.root, text="Username").pack(pady=5)
-        self.entry_user = tk.Entry(self.root, width=30, font=("Times New Roman", 11))
-        self.entry_user.pack(pady=5)
-        self.entry_user.focus()
-
+        # email
+        tk.Label(self.root, text="Email").pack(pady=5)
+        self.entry_email = tk.Entry(self.root, width=30, font=("Times New Roman", 11))
+        self.entry_email.pack(pady=5)
+        self.entry_email.focus()
         # Password
         tk.Label(self.root, text="Password").pack(pady=5)
         self.entry_pass = tk.Entry(self.root, width=30, font=("Times New Roman", 11), show="*")
@@ -41,24 +40,24 @@ class LoginWindow(BaseWindow):
         self.root.bind("<Return>", lambda e: self.login())
 
     def login(self):
-        username = self.entry_user.get().strip()
+        email = self.entry_email.get().strip()
         password = self.entry_pass.get()
 
-        if not username or not password:
-            messagebox.showerror("Error", "Username dan password harus diisi!")
+        if not email or not password:
+            messagebox.showerror("Error", "Email dan password harus diisi!")
             return
 
-        user = User.login(username, password)
+        user = UserService.login(email, password)
         if user:
             self.root.destroy()  # tutup login
-            if user.role == "admin":
+            if user.is_admin:
                 from ui.admin_window import AdminWindow
                 AdminWindow(user).run()
             else:
                 from ui.user_window import UserWindow
                 UserWindow(user).run()
         else:
-            messagebox.showerror("Gagal", "Username atau password salah!")
+            messagebox.showerror("Gagal", "Email atau password salah!")
 
     def open_register(self):
         RegisterWindow(self.root)  # buka sebagai Toplevel
